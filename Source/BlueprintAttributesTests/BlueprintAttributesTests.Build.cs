@@ -6,8 +6,8 @@ public class BlueprintAttributesTests : ModuleRules
 {
 	public BlueprintAttributesTests(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		ShortName = "GBATests";
+		// PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+		// ShortName = "GBATests";
 
 		PublicDependencyModuleNames.AddRange(
 			new string[]
