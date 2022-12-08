@@ -1,0 +1,29 @@
+﻿{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1.0",
+	"FriendlyName": "BlueprintAttributesTests",
+	"Description": "Unit / Feature testing for BlueprintAttributes plugin",
+	"Category": "Experimental",
+	"CreatedBy": "Mickael Daniel <mklabs>",
+	"CreatedByURL": "https://mklabs.github.io",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "BlueprintAttributesTests",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "BlueprintAttributes",
+			"Enabled": true
+		}
+	]
+}
