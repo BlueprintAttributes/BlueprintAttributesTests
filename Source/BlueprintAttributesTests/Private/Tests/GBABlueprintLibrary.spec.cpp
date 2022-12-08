@@ -4,7 +4,7 @@
 #include "Misc/AutomationTest.h"
 #include "Utils/GBABlueprintLibrary.h"
 
-BEGIN_DEFINE_SPEC(FGBABlueprintLibrary, "GameplayBlueprintAttributes.GBABlueprintLibrary", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(FGBABlueprintLibrary, "BlueprintAttributes.GBABlueprintLibrary", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 
 	const FString FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats.GBA_Test_Stats_C");
 	TSubclassOf<UAttributeSet> TestAttributeSetClass = nullptr;

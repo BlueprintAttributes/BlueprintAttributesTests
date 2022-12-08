@@ -17,4 +17,4 @@ void FGBATestsModule::ShutdownModule()
 
 #undef LOCTEXT_NAMESPACE
 	
-IMPLEMENT_MODULE(FGBATestsModule, GameplayBlueprintAttributesTests)
+IMPLEMENT_MODULE(FGBATestsModule, BlueprintAttributesTests)

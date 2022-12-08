@@ -11,7 +11,7 @@
 #include "GameFramework/MovementComponent.h"
 #include "Misc/AutomationTest.h"
 
-BEGIN_DEFINE_SPEC(FGBAAttributeSetBlueprintBaseSpec, "GameplayBlueprintAttributes.GBAAttributeSetBlueprintBase", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(FGBAAttributeSetBlueprintBaseSpec, "BlueprintAttributes.GBAAttributeSetBlueprintBase", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 
 	UWorld* World = nullptr;
 	uint64 InitialFrameCounter = 0;

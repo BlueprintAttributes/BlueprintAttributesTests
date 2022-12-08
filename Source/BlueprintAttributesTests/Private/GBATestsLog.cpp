@@ -3,4 +3,4 @@
 
 #include "GBATestsLog.h"
 
-DEFINE_LOG_CATEGORY(LogGameplayBlueprintAttributesTests)
+DEFINE_LOG_CATEGORY(LogBlueprintAttributesTests)

@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 
-BLUEPRINTATTRIBUTESTESTS_API DECLARE_LOG_CATEGORY_EXTERN(LogGameplayBlueprintAttributesTests, Display, All);
+BLUEPRINTATTRIBUTESTESTS_API DECLARE_LOG_CATEGORY_EXTERN(LogBlueprintAttributesTests, Display, All);
 
 #define GBA_TESTS_LOG(Verbosity, Format, ...) \
 { \
-    UE_LOG(LogGameplayBlueprintAttributesTests, Verbosity, Format, ##__VA_ARGS__); \
+    UE_LOG(LogBlueprintAttributesTests, Verbosity, Format, ##__VA_ARGS__); \
 }
