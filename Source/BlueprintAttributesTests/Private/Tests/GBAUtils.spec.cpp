@@ -6,7 +6,7 @@
 
 BEGIN_DEFINE_SPEC(FGBAUtilsSpec, "GameplayBlueprintAttributes.GBAUtils", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 
-	const FString FixtureLoadPath = TEXT("/GameplayBlueprintAttributesTests/Tests/Fixtures/GBAUtils_Spec/GBA_AttributeSetsUtils_Test.GBA_AttributeSetsUtils_Test_C");
+	const FString FixtureLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAUtils_Spec/GBA_AttributeSetsUtils_Test.GBA_AttributeSetsUtils_Test_C");
 
 END_DEFINE_SPEC(FGBAUtilsSpec)
 

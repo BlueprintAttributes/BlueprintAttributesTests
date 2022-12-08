@@ -5,9 +5,9 @@
 
 BEGIN_DEFINE_SPEC(FGBASandbox, "GameplayBlueprintAttributes.GBASandbox", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 
-	const FString FixtureLoadPath = TEXT("/GameplayBlueprintAttributesTests/Tests/Fixtures/GBAUtils_Spec/GBA_AttributeSetsUtils_Test.GBA_AttributeSetsUtils_Test_C");
-	const FString FixtureAttributeSetLoadPath = TEXT("/GameplayBlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats.GBA_Test_Stats_C");
-	const FString FixtureClampAttributeSetLoadPath = TEXT("/GameplayBlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Clamping.GBA_Test_Clamping_C");
+	const FString FixtureLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAUtils_Spec/GBA_AttributeSetsUtils_Test.GBA_AttributeSetsUtils_Test_C");
+	const FString FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats.GBA_Test_Stats_C");
+	const FString FixtureClampAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Clamping.GBA_Test_Clamping_C");
 
 	bool CheckStuff()
 	{

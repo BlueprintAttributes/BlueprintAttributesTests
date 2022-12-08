@@ -5,6 +5,7 @@
 #include "GBATestsNativeTags.h"
 #include "GBATestsStorageSubsystem.h"
 #include "Abilities/GBAAttributeSetBlueprintBase.h"
+#include "Animation/AnimInstance.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/MovementComponent.h"
@@ -23,12 +24,12 @@ BEGIN_DEFINE_SPEC(FGBAAttributeSetBlueprintBaseSpec, "GameplayBlueprintAttribute
 	UGBAAttributeSetBlueprintBase* TestAttributeSet = nullptr;
 	UGBAAttributeSetBlueprintBase* TestClampAttributeSet = nullptr;
 
-	const FString FixtureCharacterLoadPath = TEXT("/GameplayBlueprintAttributesTests/Tests/Fixtures/BP_Attributes_Test_Character.BP_Attributes_Test_Character_C");
-	const FString FixtureAttributeSetLoadPath = TEXT("/GameplayBlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats.GBA_Test_Stats_C");
-	const FString FixtureClampAttributeSetLoadPath = TEXT("/GameplayBlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Clamping.GBA_Test_Clamping_C");
-	const FString FixtureGameplayEffectLoadPath = TEXT("/GameplayBlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Stats_Init.GE_Test_Stats_Init_C");
-	const FString FixtureGameplayEffectAddLoadPath = TEXT("/GameplayBlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Add.GE_Test_Clamped_Add_C");
-	const FString FixtureGameplayEffectSubLoadPath = TEXT("/GameplayBlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Substract.GE_Test_Clamped_Substract_C");
+	const FString FixtureCharacterLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/BP_Attributes_Test_Character.BP_Attributes_Test_Character_C");
+	const FString FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats.GBA_Test_Stats_C");
+	const FString FixtureClampAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Clamping.GBA_Test_Clamping_C");
+	const FString FixtureGameplayEffectLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Stats_Init.GE_Test_Stats_Init_C");
+	const FString FixtureGameplayEffectAddLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Add.GE_Test_Clamped_Add_C");
+	const FString FixtureGameplayEffectSubLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Substract.GE_Test_Clamped_Substract_C");
 
 	static UGBATestsStorageSubsystem& GetStorage()
 	{
@@ -259,7 +260,7 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 
 		It(TEXT("should have Attributes values initialized to 0"), [this]()
 		{
-			// Those Attributes are defined in the BP /GameplayBlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats
+			// Those Attributes are defined in the BP /BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats
 			TestAttribute(TEXT("Vitality"));
 			TestAttribute(TEXT("Endurance"));
 			TestAttribute(TEXT("Strength"));
@@ -429,7 +430,7 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 			TestAttribute(TEXT("Faith"), 0.f);
 			TestAttribute(TEXT("Luck"), 0.f);
 
-			const UDataTable* DataTable = StaticLoadDataTable(TEXT("/GameplayBlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/DT_Test_Stats"));
+			const UDataTable* DataTable = StaticLoadDataTable(TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/DT_Test_Stats"));
 			TestAttributeSet->InitFromMetaDataTable(DataTable);
 
 			TestAttribute(TEXT("Vitality"), 12.f);
@@ -688,7 +689,7 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 			}
 
 			// Grant (it is not done from within Character's Blueprint Begin Play)
-			const UDataTable* DataTable = StaticLoadDataTable(TEXT("/GameplayBlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/DT_Test_Clamp"));
+			const UDataTable* DataTable = StaticLoadDataTable(TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/DT_Test_Clamp"));
 			if (!DataTable)
 			{
 				AddError(FString::Printf(TEXT("Unable to load clamped data table")));
