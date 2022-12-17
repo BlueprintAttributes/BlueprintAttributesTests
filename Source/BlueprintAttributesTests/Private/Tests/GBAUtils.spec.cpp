@@ -57,7 +57,7 @@ void FGBAUtilsSpec::Define()
 				if (!Property)
 				{
 					AddError(TEXT("Invalid property returned by FGBAUtils::GetAllAttributeProperties"));
-					continue;;
+					continue;
 				}
 
 				AddInfo(FString::Printf(TEXT("Found property: %s.%s"), *Property->GetOwnerVariant().GetName(), *Property->GetName()));

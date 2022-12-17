@@ -104,10 +104,10 @@ BEGIN_DEFINE_SPEC(FGBAAttributeSetBlueprintBaseSpec, "BlueprintAttributes.GBAAtt
 		while (Time > 0.f)
 		{
 			constexpr float Step = 0.1f;
-			InWorld->Tick(ELevelTick::LEVELTICK_All, FMath::Min(Time, Step));
+			InWorld->Tick(LEVELTICK_All, FMath::Min(Time, Step));
 			Time -= Step;
 
-			// This is terrible but required for subticking like this.
+			// This is terrible but required for sub ticking like this.
 			// we could always cache the real GFrameCounter at the start of our tests and restore it when finished.
 			GFrameCounter++;
 		}
@@ -302,25 +302,25 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 		It(TEXT("UGBAAttributeSetBlueprintBase::GetOwningActor()"), [this]()
 		{
 			check(TestAttributeSet);
-		
+
 			const AActor* OwningActor = TestAttributeSet->K2_GetOwningActor();
 			AddInfo(FString::Printf(TEXT("OwningActor: %s"), *GetNameSafe(OwningActor)));
 			TestTrue(TEXT("GetOwningActor() returns correct actor"), OwningActor == TestActor);
 		});
-		
+
 		It(TEXT("UGBAAttributeSetBlueprintBase::GetOwningAbilitySystemComponent()"), [this]()
 		{
 			check(TestAttributeSet);
-		
+
 			const UAbilitySystemComponent* OwningASC = TestAttributeSet->K2_GetOwningAbilitySystemComponent();
 			AddInfo(FString::Printf(TEXT("OwningASC: %s"), *GetNameSafe(OwningASC)));
 			TestTrue(TEXT("GetOwningActor() returns correct actor"), OwningASC == TestASC);
 		});
-		
+
 		It(TEXT("UGBAAttributeSetBlueprintBase::GetActorInfo()"), [this]()
 		{
 			check(TestAttributeSet);
-		
+
 			const FGameplayAbilityActorInfo ActorInfo = TestAttributeSet->K2_GetActorInfo();
 			AddInfo(FString::Printf(TEXT("ActorInfo AvatarActor: %s"), *GetNameSafe(ActorInfo.AvatarActor.Get())));
 			AddInfo(FString::Printf(TEXT("ActorInfo OwnerActor: %s"), *GetNameSafe(ActorInfo.OwnerActor.Get())));
@@ -328,12 +328,12 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 			AddInfo(FString::Printf(TEXT("ActorInfo SkeletalMeshComponent: %s"), *GetNameSafe(ActorInfo.SkeletalMeshComponent.Get())));
 			AddInfo(FString::Printf(TEXT("ActorInfo AnimInstance: %s"), *GetNameSafe(ActorInfo.AnimInstance.Get())));
 			AddInfo(FString::Printf(TEXT("ActorInfo MovementComponent: %s"), *GetNameSafe(ActorInfo.MovementComponent.Get())));
-		
+
 			TestTrue(TEXT("ActorInfo AvatarActor"), ActorInfo.AvatarActor.Get() == TestActor);
 			TestTrue(TEXT("ActorInfo OwnerActor"), ActorInfo.OwnerActor.Get() == TestActor);
 			TestTrue(TEXT("ActorInfo AbilitySystemComponent"), ActorInfo.AbilitySystemComponent.Get() == TestASC);
 			TestTrue(TEXT("ActorInfo SkeletalMeshComponent"), ActorInfo.SkeletalMeshComponent.Get() == TestActor->GetMesh());
-			
+
 			if (!TestActor->GetMesh())
 			{
 				AddError(FString::Printf(TEXT("Couldn't get mesh from TestActor")));
@@ -341,6 +341,8 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 			}
 
 			AddInfo(FString::Printf(TEXT("TestActor AnimInstance: %s"), *GetNameSafe(TestActor->GetMesh()->GetAnimInstance())));
+
+			AddInfo(FString::Printf(TEXT("TestActor CharacterMovementComponent: %s"), *GetNameSafe(TestActor->GetCharacterMovement())));
 			TestTrue(TEXT("ActorInfo MovementComponent"), ActorInfo.MovementComponent.Get() == TestActor->GetCharacterMovement());
 		});
 
@@ -470,23 +472,22 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 				AddInfo(FString::Printf(TEXT("Checking storage for %s was set as expected"), *StorageKey.ToString()));
 				TestEqual(FString::Printf(TEXT("Storage for %s was initialized"), *StorageKey.ToString()), Payload.Attribute, Attribute);
 
-				FGBAAttributeSetExecutionData ExecData = Payload.ExecData;
-				TestTrue(TEXT("ExecData SourceActor"), ExecData.SourceActor == TestActor);
-				TestTrue(TEXT("ExecData TargetActor"), ExecData.TargetActor == TestActor);
-				TestTrue(TEXT("ExecData SourceASC"), ExecData.SourceASC == TestASC);
-				TestTrue(TEXT("ExecData TargetASC"), ExecData.TargetASC == TestASC);
+				TestTrue(TEXT("ExecData SourceActor"), Payload.ExecData.SourceActor == TestActor);
+				TestTrue(TEXT("ExecData TargetActor"), Payload.ExecData.TargetActor == TestActor);
+				TestTrue(TEXT("ExecData SourceASC"), Payload.ExecData.SourceASC == TestASC);
+				TestTrue(TEXT("ExecData TargetASC"), Payload.ExecData.TargetASC == TestASC);
 				// Test Possessing TestActor ? or maybe setup functional tests for this
-				TestTrue(TEXT("ExecData SourceController"), ExecData.SourceController == nullptr);
-				TestTrue(TEXT("ExecData TargetController"), ExecData.TargetController == nullptr);
+				TestTrue(TEXT("ExecData SourceController"), Payload.ExecData.SourceController == nullptr);
+				TestTrue(TEXT("ExecData TargetController"), Payload.ExecData.TargetController == nullptr);
 
 				// Tags ?
 				FGameplayTagContainer Container;
 				Container.AddTag(FGBATestsNativeTags::Get().TestEffect);
-				TestEqual(TEXT("ExecData SourceTags"), ExecData.SourceTags, Container);
-				TestEqual(TEXT("ExecData SpecAssetTags"), ExecData.SpecAssetTags, Container);
+				TestEqual(TEXT("ExecData SourceTags"), Payload.ExecData.SourceTags, Container);
+				TestEqual(TEXT("ExecData SpecAssetTags"), Payload.ExecData.SpecAssetTags, Container);
 
-				TestEqual(TEXT("ExecData DeltaValue"), ExecData.DeltaValue, 0.f);
-				TestEqual(TEXT("ExecData DeltaValue"), ExecData.MagnitudeValue, 10.f);
+				TestEqual(TEXT("ExecData DeltaValue"), Payload.ExecData.DeltaValue, 0.f);
+				TestEqual(TEXT("ExecData DeltaValue"), Payload.ExecData.MagnitudeValue, 10.f);
 			}
 		});
 
@@ -518,23 +519,22 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 				AddInfo(FString::Printf(TEXT("Checking storage for %s was set as expected"), *StorageKey.ToString()));
 				TestEqual(FString::Printf(TEXT("Storage for %s was initialized"), *StorageKey.ToString()), Payload.Attribute, Attribute);
 
-				FGBAAttributeSetExecutionData ExecData = Payload.ExecData;
-				TestTrue(TEXT("ExecData SourceActor"), ExecData.SourceActor == TestActor);
-				TestTrue(TEXT("ExecData TargetActor"), ExecData.TargetActor == TestActor);
-				TestTrue(TEXT("ExecData SourceASC"), ExecData.SourceASC == TestASC);
-				TestTrue(TEXT("ExecData TargetASC"), ExecData.TargetASC == TestASC);
+				TestTrue(TEXT("ExecData SourceActor"), Payload.ExecData.SourceActor == TestActor);
+				TestTrue(TEXT("ExecData TargetActor"), Payload.ExecData.TargetActor == TestActor);
+				TestTrue(TEXT("ExecData SourceASC"), Payload.ExecData.SourceASC == TestASC);
+				TestTrue(TEXT("ExecData TargetASC"), Payload.ExecData.TargetASC == TestASC);
 				// Test Possessing TestActor ? or maybe setup functional tests for this
-				TestTrue(TEXT("ExecData SourceController"), ExecData.SourceController == nullptr);
-				TestTrue(TEXT("ExecData TargetController"), ExecData.TargetController == nullptr);
+				TestTrue(TEXT("ExecData SourceController"), Payload.ExecData.SourceController == nullptr);
+				TestTrue(TEXT("ExecData TargetController"), Payload.ExecData.TargetController == nullptr);
 
 				// Tags ?
 				FGameplayTagContainer Container;
 				Container.AddTag(FGBATestsNativeTags::Get().TestEffect);
-				TestEqual(TEXT("ExecData SourceTags"), ExecData.SourceTags, Container);
-				TestEqual(TEXT("ExecData SpecAssetTags"), ExecData.SpecAssetTags, Container);
+				TestEqual(TEXT("ExecData SourceTags"), Payload.ExecData.SourceTags, Container);
+				TestEqual(TEXT("ExecData SpecAssetTags"), Payload.ExecData.SpecAssetTags, Container);
 
-				TestEqual(TEXT("ExecData DeltaValue"), ExecData.DeltaValue, 0.f);
-				TestEqual(TEXT("ExecData DeltaValue"), ExecData.MagnitudeValue, 10.f);
+				TestEqual(TEXT("ExecData DeltaValue"), Payload.ExecData.DeltaValue, 0.f);
+				TestEqual(TEXT("ExecData DeltaValue"), Payload.ExecData.MagnitudeValue, 10.f);
 			}
 		});
 

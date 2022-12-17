@@ -12,7 +12,7 @@ BEGIN_DEFINE_SPEC(FGBASandbox, "BlueprintAttributes.GBASandbox", EAutomationTest
 	bool CheckStuff()
 	{
 		// Grab fixture Attribute Set class for further use later on
-		TSubclassOf<UAttributeSet> AttributeSetClass = StaticLoadClass(UAttributeSet::StaticClass(), nullptr, *FixtureAttributeSetLoadPath);
+		const TSubclassOf<UAttributeSet> AttributeSetClass = StaticLoadClass(UAttributeSet::StaticClass(), nullptr, *FixtureAttributeSetLoadPath);
 		if (!IsValid(AttributeSetClass))
 		{
 			AddError(FString::Printf(TEXT("Unable to load %s"), *FixtureAttributeSetLoadPath));
