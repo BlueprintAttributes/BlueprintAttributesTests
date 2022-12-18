@@ -1,0 +1,74 @@
+﻿// Copyright 2021-2022 Mickael Daniel. All Rights Reserved.
+
+#include "Misc/AutomationTest.h"
+#include "GBAEditorSettings.h"
+
+BEGIN_DEFINE_SPEC(FGBAEditorSettingsSpec, "BlueprintAttributes.GBAEditorSettings", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+
+
+END_DEFINE_SPEC(FGBAEditorSettingsSpec)
+
+void FGBAEditorSettingsSpec::Define()
+{
+	Describe(TEXT("GBAEditorSettings::IsAttributeFiltered()"), [this]()
+	{
+		It(TEXT("should return same name when name is without trailing _C"), [this]()
+		{
+			TestTrue(
+				TEXT("AbilitySystemComponent.OutgoingDuration filtered"),
+				UGBAEditorSettings::IsAttributeFiltered(
+					{TEXT("AbilitySystemComponent.OutgoingDuration"), TEXT("Foo")},
+					TEXT("AbilitySystemComponent.OutgoingDuration")
+				)
+			);
+
+			TestFalse(
+				TEXT("AbilitySystemComponent.OutgoingDuration not filtered"),
+				UGBAEditorSettings::IsAttributeFiltered(
+					{TEXT("Foo")},
+					TEXT("AbilitySystemComponent.OutgoingDuration")
+				)
+			);
+
+			TestFalse(
+				TEXT("AbilitySystemComponent.OutgoingDuration not filtered"),
+				UGBAEditorSettings::IsAttributeFiltered(
+					{TEXT("AbilitySysteaaamComponent.OutgoingDuration"), TEXT("Foo")},
+					TEXT("AbilitySystemComponent.OutgoingDuration")
+				)
+			);
+
+			TestTrue(
+				TEXT("ExampleSet.SomeAttribute filtered"),
+				UGBAEditorSettings::IsAttributeFiltered(
+					{TEXT("ExampleSet")},
+					TEXT("ExampleSet.SomeAttribute")
+				)
+			);
+
+			TestTrue(
+				TEXT("ExampleSet.SomeAttribute filtered"),
+				UGBAEditorSettings::IsAttributeFiltered(
+					{TEXT("ExampleSet.SomeAttribute")},
+					TEXT("ExampleSet.SomeAttribute")
+				)
+			);
+
+			TestTrue(
+				TEXT("ExampleSet.SomeAttribute filtered"),
+				UGBAEditorSettings::IsAttributeFiltered(
+					{TEXT("ExampleSet.Some")},
+					TEXT("ExampleSet.SomeAttribute")
+				)
+			);
+
+			TestFalse(
+				TEXT("ExampleSet.SomeAttribute not filtered"),
+				UGBAEditorSettings::IsAttributeFiltered(
+					{},
+					TEXT("ExampleSet.SomeAttribute")
+				)
+			);
+		});
+	});
+}

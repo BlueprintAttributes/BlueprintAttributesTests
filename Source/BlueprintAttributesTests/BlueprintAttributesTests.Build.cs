@@ -24,6 +24,7 @@ public class BlueprintAttributesTests : ModuleRules
 				"Engine",
 				"GameplayAbilities",
 				"BlueprintAttributes",
+				"BlueprintAttributesEditor",
 				"GameplayTags",
 				"Slate",
 				"SlateCore",
