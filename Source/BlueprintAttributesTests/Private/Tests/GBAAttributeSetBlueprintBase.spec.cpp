@@ -21,15 +21,22 @@ BEGIN_DEFINE_SPEC(FGBAAttributeSetBlueprintBaseSpec, "BlueprintAttributes.GBAAtt
 
 	TSubclassOf<UAttributeSet> TestAttributeSetClass = nullptr;
 	TSubclassOf<UAttributeSet> TestClampAttributeSetClass = nullptr;
+	TSubclassOf<UAttributeSet> TestClampHealthAttributeSetClass = nullptr;
+
 	UGBAAttributeSetBlueprintBase* TestAttributeSet = nullptr;
 	UGBAAttributeSetBlueprintBase* TestClampAttributeSet = nullptr;
+	UGBAAttributeSetBlueprintBase* TestClampHealthAttributeSet = nullptr;
 
 	const FString FixtureCharacterLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/BP_Attributes_Test_Character.BP_Attributes_Test_Character_C");
 	const FString FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats.GBA_Test_Stats_C");
 	const FString FixtureClampAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Clamping.GBA_Test_Clamping_C");
+	const FString FixtureClampHealthAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/AttributeBasedClamping/GBA_Test_HealthSet.GBA_Test_HealthSet_C");
+
 	const FString FixtureGameplayEffectLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Stats_Init.GE_Test_Stats_Init_C");
 	const FString FixtureGameplayEffectAddLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Add.GE_Test_Clamped_Add_C");
 	const FString FixtureGameplayEffectSubLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Substract.GE_Test_Clamped_Substract_C");
+	const FString FixtureGameplayEffectDamagePath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/AttributeBasedClamping/GE_Test_Damage.GE_Test_Damage_C");
+	const FString FixtureGameplayEffectRegenPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/AttributeBasedClamping/GE_Test_HealthRegen.GE_Test_HealthRegen_C");
 
 	static UGBATestsStorageSubsystem& GetStorage()
 	{
@@ -93,6 +100,8 @@ BEGIN_DEFINE_SPEC(FGBAAttributeSetBlueprintBaseSpec, "BlueprintAttributes.GBAAtt
 
 		// Tick a small number to verify the application tick
 		TickWorld(World, SMALL_NUMBER);
+
+		TIndirectArray<FWorldContext> WorldContexts = GEngine->GetWorldContexts();
 
 		OutInitialFrameCounter = GFrameCounter;
 
@@ -189,6 +198,17 @@ BEGIN_DEFINE_SPEC(FGBAAttributeSetBlueprintBaseSpec, "BlueprintAttributes.GBAAtt
 			InExpectedValue
 		);
 	};
+
+	static FGameplayModifierInfo& AddModifier(UGameplayEffect* Effect, FProperty* Property, EGameplayModOp::Type Op, const FScalableFloat& Magnitude)
+	{
+		const int32 Idx = Effect->Modifiers.Num();
+		Effect->Modifiers.SetNum(Idx + 1);
+		FGameplayModifierInfo& Info = Effect->Modifiers[Idx];
+		Info.ModifierMagnitude = Magnitude;
+		Info.ModifierOp = Op;
+		Info.Attribute.SetUProperty(Property);
+		return Info;
+	}
 
 END_DEFINE_SPEC(FGBAAttributeSetBlueprintBaseSpec)
 
@@ -775,6 +795,94 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 			TestAttribute(TEXT("TestClampedAttribute"), 10.f, TestClampAttributeSetClass);
 			TestAttribute(TEXT("TestNotClamped"), 90000.f, TestClampAttributeSetClass);
 		});
+	});
+
+	Describe(TEXT("Clamping (Attribute Based)"), [this]()
+	{
+		BeforeEach([this]()
+		{
+			// Grab fixture Attribute Set class for further use later on
+			TestClampHealthAttributeSetClass = StaticLoadClass(UAttributeSet::StaticClass(), nullptr, *FixtureClampHealthAttributeSetLoadPath);
+			if (!IsValid(TestClampHealthAttributeSetClass))
+			{
+				AddError(FString::Printf(TEXT("Unable to load %s"), *FixtureClampHealthAttributeSetLoadPath));
+				return;
+			}
+
+			TestASC->InitStats(TestClampHealthAttributeSetClass, nullptr);
+
+			// We need the prop to be non const (GetAttributeSet returns const value) for some of the API testing below on non const functions
+			TestClampHealthAttributeSet = Cast<UGBAAttributeSetBlueprintBase>(const_cast<UAttributeSet*>(TestASC->GetAttributeSet(TestClampHealthAttributeSetClass)));
+			if (!TestClampHealthAttributeSet)
+			{
+				AddError(FString::Printf(TEXT("Couldn't get attribute set or cast to UGBAAttributeSetBlueprintBase")));
+			}
+		});
+
+		It(TEXT("should have attributes clamped after Gameplay Effect application"), [this]()
+		{
+			TestAttribute(TEXT("Health"), 0.f, TestClampHealthAttributeSetClass);
+			TestAttribute(TEXT("MinHealth"), -20.f, TestClampHealthAttributeSetClass);
+			TestAttribute(TEXT("MaxHealth"), 80.f, TestClampHealthAttributeSetClass);
+
+			const FGameplayAttribute HealthAttribute = GetAttributeProperty(TestClampHealthAttributeSetClass, TEXT("Health"));
+			const FGameplayAttribute MaxHealthAttribute = GetAttributeProperty(TestClampHealthAttributeSetClass, TEXT("MaxHealth"));
+			
+			// Effect has a -100 modifier for health
+			ApplyGameplayEffect(TestASC, FixtureGameplayEffectDamagePath);
+			TestAttribute(TEXT("Health"), -20.f, TestClampHealthAttributeSetClass);
+
+			constexpr int32 NumPeriods = 10;
+			constexpr float PeriodSecs = 1.0f;
+			constexpr float HealPerPeriod = 5.f;
+			const float StartingHealth = TestASC->GetNumericAttribute(HealthAttribute);
+			
+			// Effect is an infinite, regen effect adding a set amount of health every 1 seconds
+			// just try and regen the health attribute
+			{
+				UGameplayEffect* BaseRegenEffect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(TEXT("HealthRegenEffect")));
+					
+				FProperty* Property = FindFieldChecked<FProperty>(TestClampHealthAttributeSetClass, TEXT("Health"));
+				AddModifier(BaseRegenEffect, Property, EGameplayModOp::Additive, FScalableFloat(HealPerPeriod));
+				
+				BaseRegenEffect->DurationPolicy = EGameplayEffectDurationType::Infinite;
+				BaseRegenEffect->Period.Value = PeriodSecs;
+
+				TestASC->ApplyGameplayEffectToSelf(BaseRegenEffect, 1.f, FGameplayEffectContextHandle());
+			}
+
+			int32 NumApplications = 0;
+
+			// Tick a small number to verify the application tick
+			TickWorld(World, SMALL_NUMBER);
+			++NumApplications;
+
+			TestAttribute(TEXT("Health"), StartingHealth + (HealPerPeriod * NumApplications), TestClampHealthAttributeSetClass);
+
+			// Tick a bit more to address possible floating point issues
+			TickWorld(World, PeriodSecs * .1f);
+
+			// Tick for twice as long
+			for (int32 i = 0; i < NumPeriods * 4; ++i)
+			{
+				// advance time by one period
+				TickWorld(World, PeriodSecs);
+
+				++NumApplications;
+
+				// check that health has been increased, but not indefinitely. Should be clamped up to the value of MaxHealth
+				AddInfo(FString::Printf(
+					TEXT("Value after tick Current: %f (Base: %f) - %s"),
+					TestASC->GetNumericAttribute(HealthAttribute),
+					TestASC->GetNumericAttributeBase(HealthAttribute),
+					*HealthAttribute.GetName()
+				));
+
+				const float ExpectedValue = FMath::Min(StartingHealth + (HealPerPeriod * NumApplications), TestASC->GetNumericAttribute(MaxHealthAttribute));
+				TestAttribute(TEXT("Health"), ExpectedValue, TestClampHealthAttributeSetClass);
+			}
+		});
+		
 	});
 
 	AfterEach([this]()
