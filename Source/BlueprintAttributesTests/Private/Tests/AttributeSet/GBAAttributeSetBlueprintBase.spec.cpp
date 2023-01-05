@@ -6,211 +6,18 @@
 #include "GBATestsStorageSubsystem.h"
 #include "Abilities/GBAAttributeSetBlueprintBase.h"
 #include "Animation/AnimInstance.h"
+#include "GBAAttributeSetSpecBase.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/MovementComponent.h"
 #include "Misc/AutomationTest.h"
 
-BEGIN_DEFINE_SPEC(FGBAAttributeSetBlueprintBaseSpec, "BlueprintAttributes.GBAAttributeSetBlueprintBase", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-
-	UWorld* World = nullptr;
-	uint64 InitialFrameCounter = 0;
-
-	ACharacter* TestActor = nullptr;
-	UAbilitySystemComponent* TestASC = nullptr;
-
-	TSubclassOf<UAttributeSet> TestAttributeSetClass = nullptr;
-	TSubclassOf<UAttributeSet> TestClampAttributeSetClass = nullptr;
-	TSubclassOf<UAttributeSet> TestClampHealthAttributeSetClass = nullptr;
-
+GBA_BEGIN_DEFINE_SPEC_WITH_BASE(FGBAAttributeSetBlueprintBaseSpec, FGBAAttributeSetSpecBase, "BlueprintAttributes.GBAAttributeSetBlueprintBase", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	UGBAAttributeSetBlueprintBase* TestAttributeSet = nullptr;
-	UGBAAttributeSetBlueprintBase* TestClampAttributeSet = nullptr;
-	UGBAAttributeSetBlueprintBase* TestClampHealthAttributeSet = nullptr;
-
-	const FString FixtureCharacterLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/BP_Attributes_Test_Character.BP_Attributes_Test_Character_C");
-	const FString FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats.GBA_Test_Stats_C");
-	const FString FixtureClampAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Clamping.GBA_Test_Clamping_C");
-	const FString FixtureClampHealthAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/AttributeBasedClamping/GBA_Test_HealthSet.GBA_Test_HealthSet_C");
-
-	const FString FixtureGameplayEffectLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Stats_Init.GE_Test_Stats_Init_C");
-	const FString FixtureGameplayEffectAddLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Add.GE_Test_Clamped_Add_C");
-	const FString FixtureGameplayEffectSubLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Substract.GE_Test_Clamped_Substract_C");
-	const FString FixtureGameplayEffectDamagePath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/AttributeBasedClamping/GE_Test_Damage.GE_Test_Damage_C");
-	const FString FixtureGameplayEffectRegenPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/AttributeBasedClamping/GE_Test_HealthRegen.GE_Test_HealthRegen_C");
-
-	static UGBATestsStorageSubsystem& GetStorage()
-	{
-		return *GEngine->GetEngineSubsystem<UGBATestsStorageSubsystem>();
-	}
-
-	/** Returns a map with keys as expected storage keys, and value the expected attribute to be set with the payload */
-	TMap<FName, FGameplayAttribute> GetStorageTestMap(const FString& InEventName) const
-	{
-		TArray<FName> Attributes = {
-			TEXT("Vitality"),
-			TEXT("Endurance"),
-			TEXT("Strength"),
-			TEXT("Dexterity"),
-			TEXT("Intelligence"),
-			TEXT("Faith"),
-			TEXT("Luck")
-		};
-
-		TMap<FName, FGameplayAttribute> StorageKeys;
-		for (const FName& Attribute : Attributes)
-		{
-			FString Key = FString::Printf(TEXT("%s_%s"), *InEventName, *Attribute.ToString());
-			StorageKeys.Add(FName(*Key), GetAttributeProperty(TestAttributeSetClass, Attribute));
-		}
-
-		return StorageKeys;
-	}
-
-	bool ApplyGameplayEffect(UAbilitySystemComponent* ASC, const FString& EffectLoadPath, const float Level = 1.f)
-	{
-		const TSubclassOf<UGameplayEffect> Effect = StaticLoadClass(UGameplayEffect::StaticClass(), nullptr, *EffectLoadPath);
-		if (!IsValid(Effect))
-		{
-			AddError(FString::Printf(TEXT("Unable to load %s"), *EffectLoadPath));
-			return false;
-		}
-
-		AddInfo(FString::Printf(TEXT("Applying effect %s (%s)"), *Effect->GetName(), *EffectLoadPath));
-		const FActiveGameplayEffectHandle Handle = ASC->BP_ApplyGameplayEffectToSelf(Effect, Level, ASC->MakeEffectContext());
-		return Handle.IsValid();
-	}
-
-	static UDataTable* StaticLoadDataTable(const FString& InPackageName)
-	{
-		return Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *InPackageName));
-	}
-
-	static UWorld* CreateWorld(uint64& OutInitialFrameCounter)
-	{
-		// Setup tests
-		UWorld* World = UWorld::CreateWorld(EWorldType::Game, false);
-		check(World);
-
-		FWorldContext& WorldContext = GEngine->CreateNewWorldContext(EWorldType::Game);
-		WorldContext.SetCurrentWorld(World);
-
-		const FURL URL;
-		World->InitializeActorsForPlay(URL);
-		World->BeginPlay();
-
-		// Tick a small number to verify the application tick
-		TickWorld(World, SMALL_NUMBER);
-
-		TIndirectArray<FWorldContext> WorldContexts = GEngine->GetWorldContexts();
-
-		OutInitialFrameCounter = GFrameCounter;
-
-		return World;
-	}
-
-	static void TickWorld(UWorld* InWorld, float Time)
-	{
-		while (Time > 0.f)
-		{
-			constexpr float Step = 0.1f;
-			InWorld->Tick(LEVELTICK_All, FMath::Min(Time, Step));
-			Time -= Step;
-
-			// This is terrible but required for sub ticking like this.
-			// we could always cache the real GFrameCounter at the start of our tests and restore it when finished.
-			GFrameCounter++;
-		}
-	}
-
-	static void TeardownWorld(UWorld* InWorld, const uint64 InFrameCounter)
-	{
-		GFrameCounter = InFrameCounter;
-
-		// Teardown tests
-		GEngine->DestroyWorldContext(InWorld);
-		InWorld->DestroyWorld(false);
-	}
-
-	static FGameplayAttribute GetAttributeProperty(const UClass* InClass, const FName& InPropertyName)
-	{
-		return FindFProperty<FProperty>(InClass, InPropertyName);
-	}
-
-	static bool HasAttributeSet(const UAbilitySystemComponent* ASC, const TSubclassOf<UAttributeSet> AttributeClass)
-	{
-		if (!ASC)
-		{
-			return false;
-		}
-
-		TArray<UAttributeSet*> AttributeSets = ASC->GetSpawnedAttributes();
-		for (const UAttributeSet* Set : AttributeSets)
-		{
-			// if (Set && Set->IsA(AttributeClass))
-
-			// We want to test for strict class equality (not child)
-			if (Set && Set->GetClass() == AttributeClass)
-			{
-				return true;
-			}
-		}
-
-		return nullptr;
-	}
-
-	void TestAttribute(const FName& InAttributePropertyName, const UClass* InAttributesSetClass = nullptr)
-	{
-		AddInfo(FString::Printf(TEXT("Checking Attribute %s"), *InAttributePropertyName.ToString()));
-		const UClass* AttributeSetClass = InAttributesSetClass ? InAttributesSetClass : TestAttributeSetClass;
-
-		const FGameplayAttribute Attribute = GetAttributeProperty(AttributeSetClass, InAttributePropertyName);
-		if (!Attribute.IsValid())
-		{
-			AddError(FString::Printf(TEXT("Attribute %s is not valid (is it granted ?)"), *InAttributePropertyName.ToString()));
-			return;
-		}
-
-		TestTrue(FString::Printf(TEXT("Attribute %s is valid"), *InAttributePropertyName.ToString()), Attribute.IsValid());
-		TestEqual(
-			FString::Printf(TEXT("Attribute %s value is valid"), *InAttributePropertyName.ToString()),
-			TestASC->GetNumericAttribute(Attribute),
-			0.f
-		);
-	}
-
-	void TestAttribute(const FName& InAttributePropertyName, const float InExpectedValue, const UClass* InAttributesSetClass = nullptr)
-	{
-		AddInfo(FString::Printf(TEXT("Checking Attribute %s for equality with %f"), *InAttributePropertyName.ToString(), InExpectedValue));
-
-		const UClass* AttributeSetClass = InAttributesSetClass ? InAttributesSetClass : TestAttributeSetClass;
-
-		const FGameplayAttribute Attribute = GetAttributeProperty(AttributeSetClass, InAttributePropertyName);
-		if (!Attribute.IsValid())
-		{
-			AddError(FString::Printf(TEXT("Attribute %s is not valid (is it granted ?)"), *InAttributePropertyName.ToString()));
-			return;
-		}
-
-		TestTrue(FString::Printf(TEXT("Attribute %s is valid"), *InAttributePropertyName.ToString()), Attribute.IsValid());
-		TestEqual(
-			FString::Printf(TEXT("Attribute %s value is %f"), *InAttributePropertyName.ToString(), InExpectedValue),
-			TestASC->GetNumericAttribute(Attribute),
-			InExpectedValue
-		);
-	};
-
-	static FGameplayModifierInfo& AddModifier(UGameplayEffect* Effect, FProperty* Property, EGameplayModOp::Type Op, const FScalableFloat& Magnitude)
-	{
-		const int32 Idx = Effect->Modifiers.Num();
-		Effect->Modifiers.SetNum(Idx + 1);
-		FGameplayModifierInfo& Info = Effect->Modifiers[Idx];
-		Info.ModifierMagnitude = Magnitude;
-		Info.ModifierOp = Op;
-		Info.Attribute.SetUProperty(Property);
-		return Info;
-	}
-
-END_DEFINE_SPEC(FGBAAttributeSetBlueprintBaseSpec)
+	
+	static constexpr const TCHAR* FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats.GBA_Test_Stats_C");
+	static constexpr const TCHAR* FixtureGameplayEffectLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Stats_Init.GE_Test_Stats_Init_C");
+GBA_END_DEFINE_SPEC(FGBAAttributeSetBlueprintBaseSpec)
 
 void FGBAAttributeSetBlueprintBaseSpec::Define()
 {
@@ -221,10 +28,10 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 		// Setup tests
 		World = CreateWorld(InitialFrameCounter);
 
-		UClass* ActorClass = StaticLoadClass(UObject::StaticClass(), nullptr, *FixtureCharacterLoadPath);
+		UClass* ActorClass = StaticLoadClass(UObject::StaticClass(), nullptr, FixtureCharacterLoadPath);
 		if (!IsValid(ActorClass))
 		{
-			AddError(FString::Printf(TEXT("Unable to load %s"), *FixtureCharacterLoadPath));
+			AddError(FString::Printf(TEXT("Unable to load %s"), FixtureCharacterLoadPath));
 			return;
 		}
 
@@ -248,10 +55,10 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 		TestActor->DispatchBeginPlay();
 
 		// Grab fixture Attribute Set class for further use later on
-		TestAttributeSetClass = StaticLoadClass(UAttributeSet::StaticClass(), nullptr, *FixtureAttributeSetLoadPath);
+		TestAttributeSetClass = StaticLoadClass(UAttributeSet::StaticClass(), nullptr, FixtureAttributeSetLoadPath);
 		if (!IsValid(TestAttributeSetClass))
 		{
-			AddError(FString::Printf(TEXT("Unable to load %s"), *FixtureAttributeSetLoadPath));
+			AddError(FString::Printf(TEXT("Unable to load %s"), FixtureAttributeSetLoadPath));
 			return;
 		}
 
@@ -293,10 +100,10 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 		It(TEXT("should have value changed after application of override instant GE"), [this]()
 		{
 			// Grab fixture Attribute Set class for further use later on
-			const TSubclassOf<UGameplayEffect> Effect = StaticLoadClass(UGameplayEffect::StaticClass(), nullptr, *FixtureGameplayEffectLoadPath);
+			const TSubclassOf<UGameplayEffect> Effect = StaticLoadClass(UGameplayEffect::StaticClass(), nullptr, FixtureGameplayEffectLoadPath);
 			if (!IsValid(Effect))
 			{
-				AddError(FString::Printf(TEXT("Unable to load %s"), *FixtureGameplayEffectLoadPath));
+				AddError(FString::Printf(TEXT("Unable to load %s"), FixtureGameplayEffectLoadPath));
 				return;
 			}
 
@@ -383,10 +190,10 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 			TestAttributeValue(TEXT("Faith"), 0.f);
 			TestAttributeValue(TEXT("Luck"), 0.f);
 
-			const TSubclassOf<UGameplayEffect> Effect = StaticLoadClass(UGameplayEffect::StaticClass(), nullptr, *FixtureGameplayEffectLoadPath);
+			const TSubclassOf<UGameplayEffect> Effect = StaticLoadClass(UGameplayEffect::StaticClass(), nullptr, FixtureGameplayEffectLoadPath);
 			if (!IsValid(Effect))
 			{
-				AddError(FString::Printf(TEXT("Unable to load %s"), *FixtureGameplayEffectLoadPath));
+				AddError(FString::Printf(TEXT("Unable to load %s"), FixtureGameplayEffectLoadPath));
 				return;
 			}
 
@@ -694,195 +501,6 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 				TestEqual(TEXT("Check payload NewValue"), Payload.NewValue, 10.f);
 			}
 		});
-	});
-
-	Describe(TEXT("Clamping (via DataTable or Clamped Struct Defaults)"), [this]()
-	{
-		BeforeEach([this]()
-		{
-			// Grab fixture Attribute Set class for further use later on
-			TestClampAttributeSetClass = StaticLoadClass(UAttributeSet::StaticClass(), nullptr, *FixtureClampAttributeSetLoadPath);
-			if (!IsValid(TestClampAttributeSetClass))
-			{
-				AddError(FString::Printf(TEXT("Unable to load %s"), *FixtureClampAttributeSetLoadPath));
-				return;
-			}
-
-			// Grant (it is not done from within Character's Blueprint Begin Play)
-			const UDataTable* DataTable = StaticLoadDataTable(TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/DT_Test_Clamp"));
-			if (!DataTable)
-			{
-				AddError(FString::Printf(TEXT("Unable to load clamped data table")));
-				return;
-			}
-
-			TestASC->InitStats(TestClampAttributeSetClass, DataTable);
-
-			// We need the prop to be non const (GetAttributeSet returns const value) for some of the API testing below on non const functions
-			TestClampAttributeSet = Cast<UGBAAttributeSetBlueprintBase>(const_cast<UAttributeSet*>(TestASC->GetAttributeSet(TestClampAttributeSetClass)));
-			if (!TestClampAttributeSet)
-			{
-				AddError(FString::Printf(TEXT("Couldn't get attribute set or cast to UGBAAttributeSetBlueprintBase")));
-			}
-		});
-
-		It(TEXT("has attributes meta map initialized"), [this]()
-		{
-			const TMap<FString, TSharedPtr<FAttributeMetaData>> AttributesMetaData = TestClampAttributeSet->AttributesMetaData;
-
-			TestFalse(TEXT("Attributes meta data not empty"), AttributesMetaData.IsEmpty());
-
-			const TArray<FString> Attributes = {TEXT("TestDTClamp"), TEXT("TestBoth")};
-			for (const FString& Attribute : Attributes)
-			{
-				const bool bHasMetaData = AttributesMetaData.Contains(Attribute);
-				TestTrue(FString::Printf(TEXT("Attributes meta data contains entry for %s"), *Attribute), AttributesMetaData.Contains(Attribute));
-
-				if (!bHasMetaData)
-				{
-					continue;
-				}
-
-				TSharedPtr<FAttributeMetaData> MetaData = AttributesMetaData.FindChecked(Attribute);
-				if (!MetaData.IsValid())
-				{
-					AddError(FString::Printf(TEXT("Metadata shared ptr invalid for %s"), *Attribute));
-					continue;
-				}
-
-				TestEqual(TEXT("Metadata Base value"), MetaData->BaseValue, 1000.f);
-				TestEqual(TEXT("Metadata Min value"), MetaData->MinValue, -100.f);
-				TestEqual(TEXT("Metadata Max value"), MetaData->MaxValue, 100.f);
-			}
-		});
-
-		It(TEXT("should have base value clamped after DT initialization"), [this]()
-		{
-			// Datable base values were set to 1000.f but clamping should have maxed it to 100.f
-			TestAttribute(TEXT("TestDTClamp"), 100.f, TestClampAttributeSetClass);
-			TestAttribute(TEXT("TestBoth"), 100.f, TestClampAttributeSetClass);
-
-			// This one was not part of the Datatable
-			TestAttribute(TEXT("TestClampedAttribute"), 0.f, TestClampAttributeSetClass);
-
-			// This was as well
-			TestAttribute(TEXT("TestNotClamped"), 0.f, TestClampAttributeSetClass);
-		});
-
-		It(TEXT("should have attributes clamped after Gameplay Effect application"), [this]()
-		{
-			TestAttribute(TEXT("TestDTClamp"), 100.f, TestClampAttributeSetClass);
-			TestAttribute(TEXT("TestBoth"), 100.f, TestClampAttributeSetClass);
-			TestAttribute(TEXT("TestClampedAttribute"), 0.f, TestClampAttributeSetClass);
-			TestAttribute(TEXT("TestNotClamped"), 0.f, TestClampAttributeSetClass);
-
-			// Effect has a -10000 modifier for each
-			ApplyGameplayEffect(TestASC, FixtureGameplayEffectSubLoadPath);
-
-			TestAttribute(TEXT("TestDTClamp"), -100.f, TestClampAttributeSetClass);
-			TestAttribute(TEXT("TestBoth"), -10.f, TestClampAttributeSetClass);
-			TestAttribute(TEXT("TestClampedAttribute"), -10.f, TestClampAttributeSetClass);
-			TestAttribute(TEXT("TestNotClamped"), -10000.f, TestClampAttributeSetClass);
-
-			// Effect has a +100000 modifier for each
-			const FGameplayAttribute Attribute = GetAttributeProperty(TestClampAttributeSetClass, TEXT("TestClampedAttribute"));
-			AddInfo(FString::Printf(TEXT("Value before GE Current: %f (Base: %f) - %s"), TestASC->GetNumericAttribute(Attribute), TestASC->GetNumericAttributeBase(Attribute), *Attribute.GetName()));
-			ApplyGameplayEffect(TestASC, FixtureGameplayEffectAddLoadPath);
-			AddInfo(FString::Printf(TEXT("Value after GE Current: %f (Base: %f) - %s"), TestASC->GetNumericAttribute(Attribute), TestASC->GetNumericAttributeBase(Attribute), *Attribute.GetName()));
-
-			TestAttribute(TEXT("TestDTClamp"), 100.f, TestClampAttributeSetClass);
-			TestAttribute(TEXT("TestBoth"), 10.f, TestClampAttributeSetClass);
-			TestAttribute(TEXT("TestClampedAttribute"), 10.f, TestClampAttributeSetClass);
-			TestAttribute(TEXT("TestNotClamped"), 90000.f, TestClampAttributeSetClass);
-		});
-	});
-
-	Describe(TEXT("Clamping (Attribute Based)"), [this]()
-	{
-		BeforeEach([this]()
-		{
-			// Grab fixture Attribute Set class for further use later on
-			TestClampHealthAttributeSetClass = StaticLoadClass(UAttributeSet::StaticClass(), nullptr, *FixtureClampHealthAttributeSetLoadPath);
-			if (!IsValid(TestClampHealthAttributeSetClass))
-			{
-				AddError(FString::Printf(TEXT("Unable to load %s"), *FixtureClampHealthAttributeSetLoadPath));
-				return;
-			}
-
-			TestASC->InitStats(TestClampHealthAttributeSetClass, nullptr);
-
-			// We need the prop to be non const (GetAttributeSet returns const value) for some of the API testing below on non const functions
-			TestClampHealthAttributeSet = Cast<UGBAAttributeSetBlueprintBase>(const_cast<UAttributeSet*>(TestASC->GetAttributeSet(TestClampHealthAttributeSetClass)));
-			if (!TestClampHealthAttributeSet)
-			{
-				AddError(FString::Printf(TEXT("Couldn't get attribute set or cast to UGBAAttributeSetBlueprintBase")));
-			}
-		});
-
-		It(TEXT("should have attributes clamped after Gameplay Effect application"), [this]()
-		{
-			TestAttribute(TEXT("Health"), 0.f, TestClampHealthAttributeSetClass);
-			TestAttribute(TEXT("MinHealth"), -20.f, TestClampHealthAttributeSetClass);
-			TestAttribute(TEXT("MaxHealth"), 80.f, TestClampHealthAttributeSetClass);
-
-			const FGameplayAttribute HealthAttribute = GetAttributeProperty(TestClampHealthAttributeSetClass, TEXT("Health"));
-			const FGameplayAttribute MaxHealthAttribute = GetAttributeProperty(TestClampHealthAttributeSetClass, TEXT("MaxHealth"));
-			
-			// Effect has a -100 modifier for health
-			ApplyGameplayEffect(TestASC, FixtureGameplayEffectDamagePath);
-			TestAttribute(TEXT("Health"), -20.f, TestClampHealthAttributeSetClass);
-
-			constexpr int32 NumPeriods = 10;
-			constexpr float PeriodSecs = 1.0f;
-			constexpr float HealPerPeriod = 5.f;
-			const float StartingHealth = TestASC->GetNumericAttribute(HealthAttribute);
-			
-			// Effect is an infinite, regen effect adding a set amount of health every 1 seconds
-			// just try and regen the health attribute
-			{
-				UGameplayEffect* BaseRegenEffect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(TEXT("HealthRegenEffect")));
-					
-				FProperty* Property = FindFieldChecked<FProperty>(TestClampHealthAttributeSetClass, TEXT("Health"));
-				AddModifier(BaseRegenEffect, Property, EGameplayModOp::Additive, FScalableFloat(HealPerPeriod));
-				
-				BaseRegenEffect->DurationPolicy = EGameplayEffectDurationType::Infinite;
-				BaseRegenEffect->Period.Value = PeriodSecs;
-
-				TestASC->ApplyGameplayEffectToSelf(BaseRegenEffect, 1.f, FGameplayEffectContextHandle());
-			}
-
-			int32 NumApplications = 0;
-
-			// Tick a small number to verify the application tick
-			TickWorld(World, SMALL_NUMBER);
-			++NumApplications;
-
-			TestAttribute(TEXT("Health"), StartingHealth + (HealPerPeriod * NumApplications), TestClampHealthAttributeSetClass);
-
-			// Tick a bit more to address possible floating point issues
-			TickWorld(World, PeriodSecs * .1f);
-
-			// Tick for twice as long
-			for (int32 i = 0; i < NumPeriods * 4; ++i)
-			{
-				// advance time by one period
-				TickWorld(World, PeriodSecs);
-
-				++NumApplications;
-
-				// check that health has been increased, but not indefinitely. Should be clamped up to the value of MaxHealth
-				AddInfo(FString::Printf(
-					TEXT("Value after tick Current: %f (Base: %f) - %s"),
-					TestASC->GetNumericAttribute(HealthAttribute),
-					TestASC->GetNumericAttributeBase(HealthAttribute),
-					*HealthAttribute.GetName()
-				));
-
-				const float ExpectedValue = FMath::Min(StartingHealth + (HealPerPeriod * NumApplications), TestASC->GetNumericAttribute(MaxHealthAttribute));
-				TestAttribute(TEXT("Health"), ExpectedValue, TestClampHealthAttributeSetClass);
-			}
-		});
-		
 	});
 
 	AfterEach([this]()
