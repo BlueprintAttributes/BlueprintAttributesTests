@@ -83,7 +83,7 @@ void FGBAAttributeSetClampingSpec::Define()
 
 		It(TEXT("has attributes meta map initialized"), [this]()
 		{
-			const TMap<FString, TSharedPtr<FAttributeMetaData>> AttributesMetaData = TestAttributeSet->AttributesMetaData;
+			const TMap<FString, TSharedPtr<FAttributeMetaData>> AttributesMetaData = TestAttributeSet->GetAttributesMetaData();
 
 			TestFalse(TEXT("Attributes meta data not empty"), AttributesMetaData.IsEmpty());
 
