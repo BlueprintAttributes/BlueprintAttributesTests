@@ -3,7 +3,7 @@
 #include "Misc/AutomationTest.h"
 #include "GBAEditorSettings.h"
 
-BEGIN_DEFINE_SPEC(FGBAEditorSettingsSpec, "BlueprintAttributes.GBAEditorSettings", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(FGBAEditorSettingsSpec, "BlueprintAttributes.Editor.GBAEditorSettings", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 
 
 END_DEFINE_SPEC(FGBAEditorSettingsSpec)
