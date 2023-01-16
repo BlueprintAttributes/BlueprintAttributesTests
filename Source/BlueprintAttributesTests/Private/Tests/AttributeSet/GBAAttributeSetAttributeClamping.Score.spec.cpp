@@ -9,7 +9,7 @@
 
 GBA_BEGIN_DEFINE_SPEC_WITH_BASE(FGBAAttributeSetAttributeClampingScoreSpec, FGBAAttributeSetSpecBase, "BlueprintAttributes.GBAAttributeSetBlueprintBase.Clamping", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	
-	static constexpr const TCHAR* FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/AttributeBasedClamping/GBA_Test_ScoreSet.GBA_Test_ScoreSet_C");
+	static constexpr const TCHAR* FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/AttributeBasedClamping/GBA_Test_ScoreSet.GBA_Test_ScoreSet_C");
 
 GBA_END_DEFINE_SPEC(FGBAAttributeSetAttributeClampingScoreSpec)
 

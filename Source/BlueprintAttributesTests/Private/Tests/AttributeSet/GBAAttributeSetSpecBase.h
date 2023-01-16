@@ -64,7 +64,7 @@ protected:
 	TSubclassOf<UAttributeSet> TestAttributeSetClass = nullptr;
 	UGBAAttributeSetBlueprintBase* TestAttributeSet = nullptr;
 	
-	static constexpr const TCHAR* FixtureCharacterLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/BP_Attributes_Test_Character.BP_Attributes_Test_Character_C");
+	static constexpr const TCHAR* FixtureCharacterLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/BP_Attributes_Test_Character.BP_Attributes_Test_Character_C");
 
 	static UGBATestsStorageSubsystem& GetStorage()
 	{

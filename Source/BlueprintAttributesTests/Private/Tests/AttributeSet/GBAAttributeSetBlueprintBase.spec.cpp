@@ -15,8 +15,8 @@
 GBA_BEGIN_DEFINE_SPEC_WITH_BASE(FGBAAttributeSetBlueprintBaseSpec, FGBAAttributeSetSpecBase, "BlueprintAttributes.GBAAttributeSetBlueprintBase", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	UGBAAttributeSetBlueprintBase* TestAttributeSet = nullptr;
 	
-	static constexpr const TCHAR* FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats.GBA_Test_Stats_C");
-	static constexpr const TCHAR* FixtureGameplayEffectLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Stats_Init.GE_Test_Stats_Init_C");
+	static constexpr const TCHAR* FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats.GBA_Test_Stats_C");
+	static constexpr const TCHAR* FixtureGameplayEffectLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Stats_Init.GE_Test_Stats_Init_C");
 GBA_END_DEFINE_SPEC(FGBAAttributeSetBlueprintBaseSpec)
 
 void FGBAAttributeSetBlueprintBaseSpec::Define()
@@ -259,7 +259,7 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 			TestAttribute(TEXT("Faith"), 0.f);
 			TestAttribute(TEXT("Luck"), 0.f);
 
-			const UDataTable* DataTable = StaticLoadDataTable(TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/DT_Test_Stats"));
+			const UDataTable* DataTable = StaticLoadDataTable(TEXT("/BlueprintAttributesTests/Fixtures/GBAAttributeSetBlueprintBase_Spec/DT_Test_Stats"));
 			TestAttributeSet->InitFromMetaDataTable(DataTable);
 
 			TestAttribute(TEXT("Vitality"), 12.f);

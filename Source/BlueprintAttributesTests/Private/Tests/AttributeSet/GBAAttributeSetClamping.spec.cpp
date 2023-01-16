@@ -9,9 +9,9 @@
 
 GBA_BEGIN_DEFINE_SPEC_WITH_BASE(FGBAAttributeSetClampingSpec, FGBAAttributeSetSpecBase, "BlueprintAttributes.GBAAttributeSetBlueprintBase.Clamping", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 
-	static constexpr const TCHAR* FixtureClampAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Clamping.GBA_Test_Clamping_C");
-	static constexpr const TCHAR* FixtureGameplayEffectAddLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Add.GE_Test_Clamped_Add_C");
-	static constexpr const TCHAR* FixtureGameplayEffectSubLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Substract.GE_Test_Clamped_Substract_C");
+	static constexpr const TCHAR* FixtureClampAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Clamping.GBA_Test_Clamping_C");
+	static constexpr const TCHAR* FixtureGameplayEffectAddLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Add.GE_Test_Clamped_Add_C");
+	static constexpr const TCHAR* FixtureGameplayEffectSubLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Substract.GE_Test_Clamped_Substract_C");
 
 GBA_END_DEFINE_SPEC(FGBAAttributeSetClampingSpec)
 
@@ -64,7 +64,7 @@ void FGBAAttributeSetClampingSpec::Define()
 			}
 
 			// Grant (it is not done from within Character's Blueprint Begin Play)
-			const UDataTable* DataTable = StaticLoadDataTable(TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/DT_Test_Clamp"));
+			const UDataTable* DataTable = StaticLoadDataTable(TEXT("/BlueprintAttributesTests/Fixtures/GBAAttributeSetBlueprintBase_Spec/DT_Test_Clamp"));
 			if (!DataTable)
 			{
 				AddError(FString::Printf(TEXT("Unable to load clamped data table")));

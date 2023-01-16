@@ -9,7 +9,7 @@
 
 GBA_BEGIN_DEFINE_SPEC_WITH_BASE(FGBAAttributeSetAttributeClampingStaminaSpec, FGBAAttributeSetSpecBase, "BlueprintAttributes.GBAAttributeSetBlueprintBase.Clamping", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	
-	static constexpr const TCHAR* FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/AttributeBasedClamping/GBA_Test_StaminaSet.GBA_Test_StaminaSet_C");
+	static constexpr const TCHAR* FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/AttributeBasedClamping/GBA_Test_StaminaSet.GBA_Test_StaminaSet_C");
 
 GBA_END_DEFINE_SPEC(FGBAAttributeSetAttributeClampingStaminaSpec)
 

@@ -9,7 +9,7 @@
 
 GBA_BEGIN_DEFINE_SPEC_WITH_BASE(FGBAAttributeSetAttributeClampingManaSpec, FGBAAttributeSetSpecBase, "BlueprintAttributes.GBAAttributeSetBlueprintBase.Clamping", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 
-	static constexpr const TCHAR* FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/AttributeBasedClamping/GBA_Test_ManaSet.GBA_Test_ManaSet_C");
+	static constexpr const TCHAR* FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/AttributeBasedClamping/GBA_Test_ManaSet.GBA_Test_ManaSet_C");
 
 GBA_END_DEFINE_SPEC(FGBAAttributeSetAttributeClampingManaSpec)
 

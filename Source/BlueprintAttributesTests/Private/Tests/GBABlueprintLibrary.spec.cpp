@@ -6,7 +6,7 @@
 
 BEGIN_DEFINE_SPEC(FGBABlueprintLibrary, "BlueprintAttributes.GBABlueprintLibrary", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 
-	const FString FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats.GBA_Test_Stats_C");
+	const FString FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats.GBA_Test_Stats_C");
 	TSubclassOf<UAttributeSet> TestAttributeSetClass = nullptr;
 
 	static FGameplayAttribute GetAttributeProperty(const UClass* InClass, const FName& InPropertyName)

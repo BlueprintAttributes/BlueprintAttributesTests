@@ -9,8 +9,8 @@
 
 GBA_BEGIN_DEFINE_SPEC_WITH_BASE(FGBAAttributeSetAttributeClampingHealthSpec, FGBAAttributeSetSpecBase, "BlueprintAttributes.GBAAttributeSetBlueprintBase.Clamping", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	
-	static constexpr const TCHAR* FixtureClampHealthAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/AttributeBasedClamping/GBA_Test_HealthSet.GBA_Test_HealthSet_C");
-	static constexpr const TCHAR* FixtureGameplayEffectDamagePath = TEXT("/BlueprintAttributesTests/Tests/Fixtures/AttributeBasedClamping/GE_Test_Damage.GE_Test_Damage_C");
+	static constexpr const TCHAR* FixtureClampHealthAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/AttributeBasedClamping/GBA_Test_HealthSet.GBA_Test_HealthSet_C");
+	static constexpr const TCHAR* FixtureGameplayEffectDamagePath = TEXT("/BlueprintAttributesTests/Fixtures/AttributeBasedClamping/GE_Test_Damage.GE_Test_Damage_C");
 
 GBA_END_DEFINE_SPEC(FGBAAttributeSetAttributeClampingHealthSpec)
 
