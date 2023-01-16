@@ -20,11 +20,12 @@ public class BlueprintAttributesTests : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
+				"BlueprintAttributes",
+				"BlueprintAttributesEditor",
+				"BlueprintGraph",
 				"CoreUObject",
 				"Engine",
 				"GameplayAbilities",
-				"BlueprintAttributes",
-				"BlueprintAttributesEditor",
 				"GameplayTags",
 				"Slate",
 				"SlateCore",
