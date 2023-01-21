@@ -44,7 +44,7 @@ BEGIN_DEFINE_SPEC(FGBAEditorSubsystemSpec, "BlueprintAttributes.Editor.GBAEditor
 		return true;
 	}
 
-	void CheckBlueprintGraphs(UBlueprint* InBlueprint)
+	void CheckBlueprintGraphs(const UBlueprint* InBlueprint)
 	{
 		AddInfo(FString::Printf(TEXT("Check Blueprint: %s"), *GetNameSafe(InBlueprint)));
 		if (!InBlueprint)
@@ -57,7 +57,7 @@ BEGIN_DEFINE_SPEC(FGBAEditorSubsystemSpec, "BlueprintAttributes.Editor.GBAEditor
 		TArray<UEdGraph*> Graphs;
 		InBlueprint->GetAllGraphs(Graphs);
 
-		UEdGraph* Graph = InBlueprint->GetLastEditedUberGraph();
+		const UEdGraph* Graph = InBlueprint->GetLastEditedUberGraph();
 		if (!Graph)
 		{
 			AddError(FString::Printf(TEXT("Failed to check blueprint (InBlueprint: %s), LastEditedUberGraph is not valid"), *GetNameSafe(InBlueprint)));
@@ -104,10 +104,14 @@ BEGIN_DEFINE_SPEC(FGBAEditorSubsystemSpec, "BlueprintAttributes.Editor.GBAEditor
 
 			FString PackageName;
 			FString AttributeName;
-			UGBAEditorSubsystem::Get().ParseAttributeFromDefaultValue(Pin->GetDefaultAsString(), PackageName, AttributeName);
+			UGBAEditorSubsystem::ParseAttributeFromDefaultValue(Pin->GetDefaultAsString(), PackageName, AttributeName);
 			AddInfo(FString::Printf(TEXT("\t Pin: %s, PackageName: %s, AttributeName: %s"), *Pin->GetName(), *PackageName, *AttributeName));
 
-			TestEqual(TEXT("New Pin value"), AttributeName, NewName.ToString());
+			const FString BlueprintName = GetNameSafe(Node->GetBlueprint());
+			const FString GraphName = GetNameSafe(Node->GetGraph());
+			const FString NodeName = Node->GetNodeTitle(ENodeTitleType::ListView).ToString();
+			const FString PinPath = FString::Printf(TEXT("%s > %s > %s"), *BlueprintName, *GraphName, *NodeName);
+			TestEqual(FString::Printf(TEXT("Check Pin value of %s"), *PinPath), AttributeName, NewName.ToString());
 		}
 	}
 
@@ -130,7 +134,6 @@ void FGBAEditorSubsystemSpec::Define()
 			if (!FixtureClass)
 			{
 				AddError(FString::Printf(TEXT("Unable to load Blueprint from class %s"), *FixtureClass->GetName()));
-				return;
 			}
 		});
 		
