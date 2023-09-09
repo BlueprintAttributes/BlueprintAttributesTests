@@ -183,7 +183,7 @@ protected:
 			}
 		}
 
-		return nullptr;
+		return false;
 	}
 
 	void TestAttribute(const FName& InAttributePropertyName, const UClass* InAttributesSetClass = nullptr)
