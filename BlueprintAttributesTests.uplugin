@@ -16,6 +16,11 @@
 	"Modules": [
 		{
 			"Name": "BlueprintAttributesTests",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "BlueprintAttributesTestsEditor",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
 		}

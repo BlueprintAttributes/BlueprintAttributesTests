@@ -6,8 +6,7 @@ public class BlueprintAttributesTests : ModuleRules
 {
 	public BlueprintAttributesTests(ReadOnlyTargetRules Target) : base(Target)
 	{
-		// PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		// ShortName = "GBATests";
+		ShortName = "GBATests";
 
 		PublicDependencyModuleNames.AddRange(
 			new string[]
@@ -21,8 +20,6 @@ public class BlueprintAttributesTests : ModuleRules
 			new string[]
 			{
 				"BlueprintAttributes",
-				"BlueprintAttributesEditor",
-				"BlueprintGraph",
 				"CoreUObject",
 				"Engine",
 				"GameplayAbilities",
@@ -31,15 +28,5 @@ public class BlueprintAttributesTests : ModuleRules
 				"SlateCore",
 			}
 		);
-		
-		if (Target.bBuildEditor)
-		{
-			PrivateDependencyModuleNames.AddRange(
-				new string[]
-				{
-					"UnrealEd"
-				}
-			);
-		}
 	}
 }
