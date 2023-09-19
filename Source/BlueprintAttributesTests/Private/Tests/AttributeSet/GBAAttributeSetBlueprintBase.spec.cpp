@@ -178,7 +178,9 @@ void FGBAAttributeSetBlueprintBaseSpec::Define()
 			auto TestAttributeValue = [this](const FName& InAttributeName, const float InExpected) -> void
 			{
 				const FGameplayAttribute Attribute = GetAttributeProperty(TestAttributeSetClass, InAttributeName);
-				const float Value = TestAttributeSet->GetAttributeValue(Attribute);
+				bool bSuccessfullyFoundAttribute = true;
+				const float Value = TestAttributeSet->GetAttributeValue(Attribute, bSuccessfullyFoundAttribute);
+				TestTrue(FString::Printf(TEXT("GetAttributeValue: bSuccessfullyFoundAttribute %s check"), *InAttributeName.ToString()), bSuccessfullyFoundAttribute);
 				TestEqual(FString::Printf(TEXT("GetAttributeValue: %s check"), *InAttributeName.ToString()), Value, InExpected);
 			};
 
