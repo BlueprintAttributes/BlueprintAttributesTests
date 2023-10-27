@@ -1,7 +1,7 @@
 ﻿{
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "0.2.0",
+	"VersionName": "0.3.0",
 	"FriendlyName": "BlueprintAttributesTests",
 	"Description": "Unit / Feature testing for BlueprintAttributes plugin",
 	"Category": "Experimental",
