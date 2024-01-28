@@ -257,7 +257,7 @@ protected:
 		}
 	};
 
-	float GetClampedExpectedValue(const FAttributeTestDefinition& InMinAttributeDef, const FAttributeTestDefinition& InMaxAttributeDef, const float InValue)
+	float GetClampedExpectedValue(const FAttributeTestDefinition& InMinAttributeDef, const FAttributeTestDefinition& InMaxAttributeDef, const float InValue) const
 	{
 		float ExpectedValue = -9999.f;
 		if (InMinAttributeDef.IsValid() && InMaxAttributeDef.IsValid())
@@ -388,5 +388,39 @@ protected:
 			const float ExpectedValue = GetClampedExpectedValue(InMinAttributeDef, InMaxAttributeDef, StartingAttributeValue + MagnitudePerPeriod * NumApplications);
 			TestAttribute(AttributeName, ExpectedValue);
 		}
+	}
+
+	void DescribeAttributeClamp(const FString& InDescription, const FString& InFixtureAssetName, TFunction<void()> DoWork)
+	{
+		const FString FixtureLoadPath = FString::Printf(
+			TEXT("/BlueprintAttributesTests/Fixtures/AttributeBasedClamping/%s.%s_C"),
+			*InFixtureAssetName,
+			*InFixtureAssetName
+		);
+		
+		Describe(InDescription, [this, FixtureLoadPath, DoWork]()
+		{
+			BeforeEach([this, FixtureLoadPath]()
+			{
+				// Grab fixture Attribute Set class for further use later on
+				TestAttributeSetClass = StaticLoadClass(UAttributeSet::StaticClass(), nullptr, *FixtureLoadPath);
+				if (!IsValid(TestAttributeSetClass))
+				{
+					AddError(FString::Printf(TEXT("Unable to load %s"), *FixtureLoadPath));
+					return;
+				}
+		
+				TestASC->InitStats(TestAttributeSetClass, nullptr);
+		
+				// We need the prop to be non const (GetAttributeSet returns const value) for some of the API testing below on non const functions
+				TestAttributeSet = Cast<UGBAAttributeSetBlueprintBase>(const_cast<UAttributeSet*>(TestASC->GetAttributeSet(TestAttributeSetClass)));
+				if (!TestAttributeSet)
+				{
+					AddError(FString::Printf(TEXT("Couldn't get attribute set or cast to UGBAAttributeSetBlueprintBase")));
+				}
+			});
+		
+			It(TEXT("should have attributes clamped after Gameplay Effect application"), DoWork);
+		});
 	}
 };

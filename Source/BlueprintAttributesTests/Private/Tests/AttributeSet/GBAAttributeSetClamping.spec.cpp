@@ -51,6 +51,26 @@ void FGBAAttributeSetClampingSpec::Define()
 		TestActor->DispatchBeginPlay();
 	});
 
+	DescribeAttributeClamp(TEXT("Clamping (Attribute Based - Health)"), TEXT("GBA_Test_HealthSet"), [this]()
+	{
+		TestAttributeClamping({ TEXT("Health"), 0.f }, { TEXT("MinHealth"), -20.f }, { TEXT("MaxHealth"), 80.f });
+	});
+
+	DescribeAttributeClamp(TEXT("Clamping (Attribute Based - Mana)"), TEXT("GBA_Test_ManaSet"), [this]()
+	{
+		TestAttributeClamping({ TEXT("Mana"), 0.f }, {}, { TEXT("MaxMana"), 120.f });
+	});
+
+	DescribeAttributeClamp(TEXT("Clamping (Attribute Based - Stamina)"), TEXT("GBA_Test_StaminaSet"), [this]()
+	{
+		TestAttributeClamping({ TEXT("Stamina"), 0.f }, {}, { TEXT("MaxStamina"), 80.f });
+	});
+
+	DescribeAttributeClamp(TEXT("Clamping (Attribute Based - Score)"), TEXT("GBA_Test_ScoreSet"), [this]()
+	{
+		TestAttributeClamping({ TEXT("Score"), 0.f }, { TEXT("MinScore"), 20.f }, {});
+	});
+
 	Describe(TEXT("Clamping (via DataTable or Clamped Struct Defaults)"), [this]()
 	{
 		BeforeEach([this]()
