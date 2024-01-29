@@ -107,7 +107,7 @@ void FGBAAttributeSetClampingSpec::Define()
 
 			TestFalse(TEXT("Attributes meta data not empty"), AttributesMetaData.IsEmpty());
 
-			const TArray<FString> Attributes = {TEXT("TestDTClamp"), TEXT("TestBoth")};
+			const TArray<FString> Attributes = { TEXT("TestDTClamp"), TEXT("TestBoth") };
 			for (const FString& Attribute : Attributes)
 			{
 				const bool bHasMetaData = AttributesMetaData.Contains(Attribute);
@@ -137,11 +137,17 @@ void FGBAAttributeSetClampingSpec::Define()
 			TestAttribute(TEXT("TestDTClamp"), 100.f);
 			TestAttribute(TEXT("TestBoth"), 100.f);
 
-			// This one was not part of the Datatable
-			TestAttribute(TEXT("TestClampedAttribute"), 0.f);
+			// This one has a 0 min value (https://github.com/BlueprintAttributes/BlueprintAttributes/issues/68)
+			// To ensure bugfix where we were checking if both Min/Max values were different than 0
+			TestAttribute(TEXT("TestDTClampMin0Value"), 100.f);
 
-			// This was as well
+			// These ones were not part of the Datatable
+			TestAttribute(TEXT("TestClampedAttribute"), 0.f);
 			TestAttribute(TEXT("TestNotClamped"), 0.f);
+
+			// Not part of datatable, but checking whether a Clamped property set to 1000.f base value and min/max to
+			// 0/100 is clamped to 100 on init
+			TestAttribute(TEXT("TestClampedAttributeOnInit"), 100.f);
 		});
 
 		It(TEXT("should have attributes clamped after Gameplay Effect application"), [this]()
