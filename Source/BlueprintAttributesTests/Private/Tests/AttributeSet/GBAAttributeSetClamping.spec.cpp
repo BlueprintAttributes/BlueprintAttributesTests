@@ -13,17 +13,6 @@ GBA_BEGIN_DEFINE_SPEC_WITH_BASE(FGBAAttributeSetClampingSpec, FGBAAttributeSetSp
 	static constexpr const TCHAR* FixtureGameplayEffectAddLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Add.GE_Test_Clamped_Add_C");
 	static constexpr const TCHAR* FixtureGameplayEffectSubLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Substract.GE_Test_Clamped_Substract_C");
 
-	/** Returns a FAttributeMetaData datatable created dynamically for all GSC Attributes */
-	static UDataTable* CreateAttributesDataTable()
-	{
-		const FString CSV = TEXT(R"(
-			---,BaseValue,MinValue,MaxValue,DerivedAttributeInfo,bCanStack
-			GBA_Health_Set.Health,"1000.000000","0.000000","0.000000","","False"
-		 )");
-
-		return CreateAttributesDataTable();
-	}
-
 	static UDataTable* CreateAttributesDataTable(const FString& InCsvContent)
 	{
 		// TArray<FString> Lines;
