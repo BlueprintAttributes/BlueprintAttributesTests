@@ -8,4 +8,4 @@ Workflow: `./github/workflows/sync-tests-repo.yml`
 
 TODO:
 
-- Rework and extract TestStorage into its own repo
+- Rework and extract TestStorage into its own repo.
