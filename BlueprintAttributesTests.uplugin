@@ -4,7 +4,7 @@
 	"VersionName": "0.4.0",
 	"FriendlyName": "BlueprintAttributesTests",
 	"Description": "Unit / Feature testing for BlueprintAttributes plugin",
-	"Category": "Experimental",
+	"Category": "Testing",
 	"CreatedBy": "Mickael Daniel <mklabs>",
 	"CreatedByURL": "https://mklabs.github.io",
 	"DocsURL": "",
