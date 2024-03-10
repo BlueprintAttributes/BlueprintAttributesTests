@@ -1,4 +1,4 @@
-// Copyright 2021-2022 Mickael Daniel. All Rights Reserved.
+// Copyright 2022-2024 Mickael Daniel. All Rights Reserved.
 
 #pragma once
 
