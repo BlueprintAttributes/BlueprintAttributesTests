@@ -4,6 +4,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AttributeSet.h"
+#include "GBATestsStorageSubsystem.h"
 #include "GameplayEffect.h"
 #include "Misc/AutomationTest.h"
 
@@ -43,7 +44,6 @@
 		}
 #endif
 
-class UGBATestsStorageSubsystem;
 class UGBAAttributeSetBlueprintBase;
 
 class FGBAAttributeSetSpecBase : public FAutomationSpecBase
