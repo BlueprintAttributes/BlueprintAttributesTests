@@ -7,7 +7,33 @@
 #include "GBATestsStorageSubsystem.h"
 #include "GameplayEffect.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/EngineVersionComparison.h"
 
+#if UE_VERSION_OLDER_THAN(5, 5, 0)
+#define GBA_BEGIN_DEFINE_SPEC_WITH_BASE_PRIVATE( TClass, TBaseClass, PrettyName, TFlags, FileName, LineNumber ) \
+	class TClass : public TBaseClass \
+	{ \
+	public: \
+		TClass( const FString& InName ) \
+		: TBaseClass( InName ) {\
+			static_assert((TFlags)&EAutomationTestFlags::ApplicationContextMask, "AutomationTest has no application flag.  It shouldn't run.  See AutomationTest.h."); \
+			static_assert(	(((TFlags)&EAutomationTestFlags::FilterMask) == EAutomationTestFlags::SmokeFilter) || \
+							(((TFlags)&EAutomationTestFlags::FilterMask) == EAutomationTestFlags::EngineFilter) || \
+							(((TFlags)&EAutomationTestFlags::FilterMask) == EAutomationTestFlags::ProductFilter) || \
+							(((TFlags)&EAutomationTestFlags::FilterMask) == EAutomationTestFlags::PerfFilter) || \
+							(((TFlags)&EAutomationTestFlags::FilterMask) == EAutomationTestFlags::StressFilter) || \
+							(((TFlags)&EAutomationTestFlags::FilterMask) == EAutomationTestFlags::NegativeFilter), \
+							"All AutomationTests must have exactly 1 filter type specified.  See AutomationTest.h."); \
+		} \
+		virtual uint32 GetTestFlags() const override { return TFlags; } \
+		using FAutomationSpecBase::GetTestSourceFileName; \
+		virtual FString GetTestSourceFileName() const override { return FileName; } \
+		using FAutomationSpecBase::GetTestSourceFileLine; \
+		virtual int32 GetTestSourceFileLine() const override { return LineNumber; } \
+	protected: \
+		virtual FString GetBeautifiedTestName() const override { return PrettyName; } \
+		virtual void Define() override;
+#else
 #define GBA_BEGIN_DEFINE_SPEC_WITH_BASE_PRIVATE( TClass, TBaseClass, PrettyName, TFlags, FileName, LineNumber ) \
 	class TClass : public TBaseClass \
 	{ \
@@ -31,6 +57,7 @@
 	protected: \
 		virtual FString GetBeautifiedTestName() const override { return PrettyName; } \
 		virtual void Define() override;
+#endif
 
 #if WITH_AUTOMATION_WORKER
 	#define GBA_BEGIN_DEFINE_SPEC_WITH_BASE( TClass, TBaseClass, PrettyName, TFlags ) \
