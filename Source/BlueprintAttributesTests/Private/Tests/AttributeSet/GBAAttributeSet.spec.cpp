@@ -2,17 +2,25 @@
 
 #include "AbilitySystemComponent.h"
 #include "AttributeSet.h"
+#include "GBAAttributeSetSpecBase.h"
 #include "GBATestsNativeTags.h"
 #include "GBATestsStorageSubsystem.h"
 #include "Abilities/GBAAttributeSetBlueprintBase.h"
 #include "Animation/AnimInstance.h"
-#include "GBAAttributeSetSpecBase.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/MovementComponent.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/EngineVersionComparison.h"
 
-GBA_BEGIN_DEFINE_SPEC_WITH_BASE(FGBAAttributeSetBlueprintBaseSpec, FGBAAttributeSetSpecBase, "BlueprintAttributes.GBAAttributeSetBlueprintBase", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+#if UE_VERSION_OLDER_THAN(5, 5, 0)
+
+// 5.4.x and down
+inline constexpr uint8 EAutomationTestFlags_ApplicationContextMask = EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::ServerContext | EAutomationTestFlags::CommandletContext;
+
+#endif
+
+GBA_BEGIN_DEFINE_SPEC_WITH_BASE(FGBAAttributeSetBlueprintBaseSpec, FGBAAttributeSetSpecBase, "BlueprintAttributes.GBAAttributeSetBlueprintBase", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	UGBAAttributeSetBlueprintBase* TestAttributeSet = nullptr;
 	
 	static constexpr const TCHAR* FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Stats.GBA_Test_Stats_C");

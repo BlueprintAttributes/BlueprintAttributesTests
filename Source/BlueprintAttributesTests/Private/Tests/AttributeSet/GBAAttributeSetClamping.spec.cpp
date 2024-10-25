@@ -2,12 +2,20 @@
 
 #include "AbilitySystemComponent.h"
 #include "AttributeSet.h"
-#include "Abilities/GBAAttributeSetBlueprintBase.h"
 #include "GBAAttributeSetSpecBase.h"
+#include "Abilities/GBAAttributeSetBlueprintBase.h"
 #include "GameFramework/Character.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/EngineVersionComparison.h"
 
-GBA_BEGIN_DEFINE_SPEC_WITH_BASE(FGBAAttributeSetClampingSpec, FGBAAttributeSetSpecBase, "BlueprintAttributes.GBAAttributeSetBlueprintBase.Clamping", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+#if UE_VERSION_OLDER_THAN(5, 5, 0)
+
+// 5.4.x and down
+inline constexpr uint8 EAutomationTestFlags_ApplicationContextMask = EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::ServerContext | EAutomationTestFlags::CommandletContext;
+
+#endif
+
+GBA_BEGIN_DEFINE_SPEC_WITH_BASE(FGBAAttributeSetClampingSpec, FGBAAttributeSetSpecBase, "BlueprintAttributes.GBAAttributeSetBlueprintBase.Clamping", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 
 	static constexpr const TCHAR* FixtureClampAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GBA_Test_Clamping.GBA_Test_Clamping_C");
 	static constexpr const TCHAR* FixtureGameplayEffectAddLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/GBAAttributeSetBlueprintBase_Spec/GE_Test_Clamped_Add.GE_Test_Clamped_Add_C");

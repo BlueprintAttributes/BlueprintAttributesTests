@@ -5,9 +5,17 @@
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Subsystems/GBAEditorSubsystem.h"
 
-BEGIN_DEFINE_SPEC(FGBAEditorSubsystemSpec, "BlueprintAttributes.Editor.GBAEditorSubsystem", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+#if UE_VERSION_OLDER_THAN(5, 5, 0)
+
+// 5.4.x and down
+inline constexpr uint8 EAutomationTestFlags_ApplicationContextMask = EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::ServerContext | EAutomationTestFlags::CommandletContext;
+
+#endif
+
+BEGIN_DEFINE_SPEC(FGBAEditorSubsystemSpec, "BlueprintAttributes.Editor.GBAEditorSubsystem", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	const FString FixtureAttributeSetLoadPath = TEXT("/BlueprintAttributesTests/Fixtures/GBAEditorSubsystem/GBA_Reff_Test.GBA_Reff_Test_C");
 	TWeakObjectPtr<UBlueprint> BlueprintWeakPtr = nullptr;
 
