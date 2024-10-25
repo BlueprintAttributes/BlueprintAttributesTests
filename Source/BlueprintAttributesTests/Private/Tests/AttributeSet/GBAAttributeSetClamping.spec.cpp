@@ -9,10 +9,7 @@
 #include "Misc/EngineVersionComparison.h"
 
 #if UE_VERSION_OLDER_THAN(5, 5, 0)
-
-// 5.4.x and down
-inline constexpr uint8 EAutomationTestFlags_ApplicationContextMask = EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::ServerContext | EAutomationTestFlags::CommandletContext;
-
+#include "GBATestsFlags.h"
 #endif
 
 GBA_BEGIN_DEFINE_SPEC_WITH_BASE(FGBAAttributeSetClampingSpec, FGBAAttributeSetSpecBase, "BlueprintAttributes.GBAAttributeSetBlueprintBase.Clamping", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)

@@ -9,10 +9,7 @@
 #include "Subsystems/GBAEditorSubsystem.h"
 
 #if UE_VERSION_OLDER_THAN(5, 5, 0)
-
-// 5.4.x and down
-inline constexpr uint8 EAutomationTestFlags_ApplicationContextMask = EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::ServerContext | EAutomationTestFlags::CommandletContext;
-
+#include "GBATestsFlags.h"
 #endif
 
 BEGIN_DEFINE_SPEC(FGBAEditorSubsystemSpec, "BlueprintAttributes.Editor.GBAEditorSubsystem", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)

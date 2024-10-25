@@ -6,10 +6,7 @@
 #include "Utils/GBABlueprintLibrary.h"
 
 #if UE_VERSION_OLDER_THAN(5, 5, 0)
-
-// 5.4.x and down
-inline constexpr uint8 EAutomationTestFlags_ApplicationContextMask = EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::ServerContext | EAutomationTestFlags::CommandletContext;
-
+#include "GBATestsFlags.h"
 #endif
 
 BEGIN_DEFINE_SPEC(FGBABlueprintLibrary, "BlueprintAttributes.GBABlueprintLibrary", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
