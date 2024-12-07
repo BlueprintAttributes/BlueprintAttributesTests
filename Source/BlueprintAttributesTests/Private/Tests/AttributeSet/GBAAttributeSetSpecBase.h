@@ -6,8 +6,13 @@
 #include "AttributeSet.h"
 #include "GBATestsStorageSubsystem.h"
 #include "GameplayEffect.h"
+#include "Engine/Engine.h"
 #include "Misc/AutomationTest.h"
 #include "Misc/EngineVersionComparison.h"
+#include "UObject/Package.h"
+
+class ACharacter;
+class UGBAAttributeSetBlueprintBase;
 
 #if UE_VERSION_OLDER_THAN(5, 5, 0)
 #define GBA_BEGIN_DEFINE_SPEC_WITH_BASE_PRIVATE( TClass, TBaseClass, PrettyName, TFlags, FileName, LineNumber ) \
@@ -70,8 +75,6 @@
 			TClass TClass##AutomationSpecInstance( TEXT(#TClass) );\
 		}
 #endif
-
-class UGBAAttributeSetBlueprintBase;
 
 class FGBAAttributeSetSpecBase : public FAutomationSpecBase
 {

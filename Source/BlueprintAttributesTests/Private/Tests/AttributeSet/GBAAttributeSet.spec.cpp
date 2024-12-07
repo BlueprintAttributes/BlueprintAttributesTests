@@ -7,6 +7,7 @@
 #include "GBATestsStorageSubsystem.h"
 #include "Abilities/GBAAttributeSetBlueprintBase.h"
 #include "Animation/AnimInstance.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/MovementComponent.h"
