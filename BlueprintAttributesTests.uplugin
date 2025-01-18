@@ -1,34 +1,34 @@
 ﻿{
-	"FileVersion": 3,
-	"Version": 1,
-	"VersionName": "1.1.0",
-	"FriendlyName": "BlueprintAttributesTests",
-	"Description": "Unit / Feature testing for BlueprintAttributes plugin",
-	"Category": "Testing",
-	"CreatedBy": "Mickael Daniel <mklabs>",
-	"CreatedByURL": "https://mklabs.github.io",
-	"DocsURL": "",
-	"MarketplaceURL": "",
-	"CanContainContent": true,
-	"IsBetaVersion": false,
-	"IsExperimentalVersion": false,
-	"Installed": false,
-	"Modules": [
-		{
-			"Name": "BlueprintAttributesTests",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		},
-		{
-			"Name": "BlueprintAttributesTestsEditor",
-			"Type": "Editor",
-			"LoadingPhase": "Default"
-		}
-	],
-	"Plugins": [
-		{
-			"Name": "BlueprintAttributes",
-			"Enabled": true
-		}
-	]
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.1.0",
+  "FriendlyName": "BlueprintAttributesTests",
+  "Description": "Unit / Feature testing for BlueprintAttributes plugin",
+  "Category": "Testing",
+  "CreatedBy": "Mickael Daniel <mklabs>",
+  "CreatedByURL": "https://mklabs.github.io",
+  "DocsURL": "",
+  "MarketplaceURL": "",
+  "CanContainContent": true,
+  "IsBetaVersion": false,
+  "IsExperimentalVersion": false,
+  "Installed": false,
+  "Modules": [
+    {
+      "Name": "BlueprintAttributesTests",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "BlueprintAttributesTestsEditor",
+      "Type": "Editor",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "BlueprintAttributes",
+      "Enabled": true
+    }
+  ]
 }
